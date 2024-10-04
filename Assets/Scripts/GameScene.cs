@@ -108,6 +108,9 @@ public class GameScene : MonoBehaviour
             cha.HorizontalMove(dir),
             cha.VerticalMove(doJump)
         );
+        Vector2 finalMoveTo = wishToPos;
+        bool finalOnGround = false;
+        
         //角色本fixedUpdate的移动脚下中心“射线”
         Segment chaMove = new Segment(chaPos, wishToPos);
 
@@ -126,13 +129,40 @@ public class GameScene : MonoBehaviour
         
         //todo 如果即飞上升，又非下落，就要判断脚下是否空了，空了就要下落（改变falling）
         
-        //todo 如果下落中（falling），就要判断是否落地了（最接近的地面就是落地）
+        //如果下落中（falling），就要判断是否落地了（最接近的地面就是落地）
+        if (falling)
+        {
+            //往下掉的起点y
+            float startY = chaPos.y;
+            //最接近起点的y点坐标
+            float nearestY = wishToPos.y;
+            //遍历每个地板，与3条下落的射线，有交点，且最高的点，就是要落到的地面
+            Segment[] check = new Segment[] { chaMove, chaLeftFootMove, chaRightFootMove };
+            foreach (Segment floor in _floors)
+            {
+                foreach (Segment moveSeg in check)
+                {
+                    //如果碰到了地面，则会有移动线段和地板的交点
+                    if (Geometry.SegmentIntersecting(moveSeg, floor, out Vector2 floorPoint))
+                    {
+                        finalOnGround = true; //肯定算碰到地面了
+                        nearestY = Mathf.Max(nearestY, floorPoint.y); //2个y取更高的那个，毕竟是从上而下 
+                    }
+                    if (floor.p1.y <= 0) Debug.Log("cha.y" + finalMoveTo.y + ">>" + chaMove.p0 + "->" + chaMove.p1 + " <> " + floor.p0 + "->" + floor.p1 + ") >>" + finalOnGround + ">>>" + floorPoint);
+                }
+                
+            }
+            //到此，移动结果的y坐标确定，并且最终是否落地确定了
+            finalMoveTo = new Vector2(finalMoveTo.x, nearestY);
+            
+        }
         
         //todo 上面获得了最终落点y值，接下来就是根据左右移动，分别和_leftWalls（向右移动）和_rightWalls（向左移动）来得到新的x，当然不移动的话，就简单了对吧……
         
-        //todo 最终改变角色的OnGround等状态，以及设置其正确坐标（事实上，上面这个过程我们都会在改变wishToPos)
+        //todo 最终改变角色的OnGround等状态，以及设置其正确坐标（事实上，上面这个过程我们都会在改变finalMoveTo)
         
         //最后设置新的pos
-        cha.transform.position = wishToPos;
+        cha.transform.position = finalMoveTo;
+        cha.SetOnGround(finalOnGround);
     }
 }

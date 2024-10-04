@@ -15,6 +15,8 @@ public class Character : MonoBehaviour
     /// 当前是否在地面上
     /// </summary>
     public bool OnGround { get; private set; } = false;
+
+    public void SetOnGround(bool on) => OnGround = on;
     
     /// <summary>
     /// 当前这个FixedUpdate要移动的速度

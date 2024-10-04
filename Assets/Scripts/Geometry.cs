@@ -35,6 +35,7 @@ public static class Geometry
     
     /// <summary>
     /// 判断2个线段是否交叉
+    /// todo 显然这个算法有问题
     /// </summary>
     /// <param name="a">线段a</param>
     /// <param name="b">线段b</param>
