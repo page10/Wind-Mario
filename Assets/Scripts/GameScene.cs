@@ -109,7 +109,7 @@ public class GameScene : MonoBehaviour
             cha.VerticalMove(doJump)
         );
         Vector2 finalMoveTo = wishToPos;
-        bool finalOnGround = false;
+        bool finalOnGround = cha.OnGround;
         
         //角色本fixedUpdate的移动脚下中心“射线”
         Segment chaMove = new Segment(chaPos, wishToPos);
@@ -146,14 +146,15 @@ public class GameScene : MonoBehaviour
                     if (Geometry.SegmentIntersecting(moveSeg, floor, out Vector2 floorPoint))
                     {
                         finalOnGround = true; //肯定算碰到地面了
-                        nearestY = Mathf.Max(nearestY, floorPoint.y); //2个y取更高的那个，毕竟是从上而下 
+                        nearestY = Mathf.Max(nearestY, floor.p0.y); //2个y取更高的那个，毕竟是从上而下 todo 因为out的交点不对，所以直接取地板的y （反正地板肯定水平）
                     }
-                    if (floor.p1.y <= 0) Debug.Log("cha.y" + finalMoveTo.y + ">>" + chaMove.p0 + "->" + chaMove.p1 + " <> " + floor.p0 + "->" + floor.p1 + ") >>" + finalOnGround + ">>>" + floorPoint);
+                    // if (floor.p1.y <= 0 && moveSeg.p0.y >= floor.p1.y && moveSeg.p1.y <= floor.p1.y) 
+                    //     Debug.Log("cha.y" + finalMoveTo.y + ">>" + moveSeg.p0 + "->" + moveSeg.p1 + " <> " + floor.p0 + "->" + floor.p1 + ") >>" + finalOnGround + ">>>" + floorPoint);
                 }
                 
             }
-            //到此，移动结果的y坐标确定，并且最终是否落地确定了
-            finalMoveTo = new Vector2(finalMoveTo.x, nearestY);
+            //到此，移动结果的y坐标确定，并且最终是否落地确定了，如果碰到地面，则往上抬0.001米，避免不断下落（这也是经典的“偷1像素”，否则脚下和地面相等就会出现判定错误）
+            finalMoveTo = new Vector2(finalMoveTo.x, nearestY + (finalOnGround ? 0.001f : 0));
             
         }
         

@@ -35,7 +35,7 @@ public static class Geometry
     
     /// <summary>
     /// 判断2个线段是否交叉
-    /// todo 显然这个算法有问题
+    /// todo 显然这个算法有问题，交点是不对的
     /// </summary>
     /// <param name="a">线段a</param>
     /// <param name="b">线段b</param>
@@ -47,17 +47,26 @@ public static class Geometry
         Vector2 a2 = a.p1;
         Vector2 b1 = b.p0;
         Vector2 b2 = b.p1;
-        Vector2 ab = new Vector2(a2.x - a1.x, a2.y - a1.y);
-        Vector2 cd = new Vector2(b2.x - b1.x, b2.y - b1.y);
-        Vector2 ac = new Vector2(b1.x - a1.x, b1.y - a1.y);
-        Vector2 ad = new Vector2(b2.x - a1.x, b2.y - a1.y);
+        
+        Vector2 ab = a2 - a1;
+        Vector2 ac = b1 - a1;
+        Vector2 ad = b2 - a1;
 
-        float crossProduct1 = CrossProduct(ab, ac);
-        float crossProduct2 = CrossProduct(ab, ad);
-        float crossProduct3 = CrossProduct(cd, ac);
-        float crossProduct4 = CrossProduct(cd, ad);
+        float cross1 = CrossProduct(ab, ac);
+        float cross2 = CrossProduct(ab, ad);
+        
+        Vector2 cd = b2 - b1;
+        Vector2 ca = a1 - b1;
+        Vector2 cb = a2 - b1;
 
-        bool res = (crossProduct1 * crossProduct2 < 0) && (crossProduct3 * crossProduct4 < 0);
+        // 计算向量 CD 和 CA 的叉乘结果
+        float cross3 = CrossProduct(cd, ca);
+        // 计算向量 CD 和 CB 的叉乘结果
+        float cross4 = CrossProduct(cd, cb);
+
+        // 如果 AB 与 AC、AD 的叉乘结果符号不同，且 CD 与 CA、CB 的叉乘结果符号不同，则两条线段相交
+        bool res = cross1 * cross2 < 0 && cross3 * cross4 < 0;
+
         intersectionPoint = Vector2.zero;
         if (res)
         {
