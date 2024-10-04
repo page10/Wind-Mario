@@ -123,11 +123,13 @@ public class GameScene : MonoBehaviour
         Segment chaRightHeadMove = new Segment(cha.FootRightPlus + chaPos + cha.ColliderHeight, cha.FootRightPlus + wishToPos + cha.ColliderHeight); //也可以看做向右的右边上方点
         
         bool rising = wishToPos.y > chaPos.y; //是否在上升
-        bool falling = wishToPos.y < chaPos.y; //是否在下落
+        bool falling = wishToPos.y <= chaPos.y; //是否在下落
         
         //todo 如果上升中（rising），就要获得是否撞到天花板了（当然是最接近自己脑袋的天花板），所有的天花板线_roof
-        
-        //todo 如果即飞上升，又非下落，就要判断脚下是否空了，空了就要下落（改变falling）
+        if (rising)
+        {
+            
+        }
         
         //如果下落中（falling），就要判断是否落地了（最接近的地面就是落地）
         if (falling)
