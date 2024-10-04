@@ -109,7 +109,7 @@ public class GameScene : MonoBehaviour
             cha.VerticalMove(doJump)
         );
         Vector2 finalMoveTo = wishToPos;
-        bool finalOnGround = cha.OnGround;
+        bool finalOnGround = true;
         
         //角色本fixedUpdate的移动脚下中心“射线”
         Segment chaMove = new Segment(chaPos, wishToPos);
@@ -123,16 +123,14 @@ public class GameScene : MonoBehaviour
         Segment chaRightHeadMove = new Segment(cha.FootRightPlus + chaPos + cha.ColliderHeight, cha.FootRightPlus + wishToPos + cha.ColliderHeight); //也可以看做向右的右边上方点
         
         bool rising = wishToPos.y > chaPos.y; //是否在上升
-        bool falling = wishToPos.y <= chaPos.y; //是否在下落
         
         //todo 如果上升中（rising），就要获得是否撞到天花板了（当然是最接近自己脑袋的天花板），所有的天花板线_roof
         if (rising)
         {
             
         }
-        
-        //如果下落中（falling），就要判断是否落地了（最接近的地面就是落地）
-        if (falling)
+        //如果下落中（falling，非rising即falling），就要判断是否落地了（最接近的地面就是落地）
+        else
         {
             //往下掉的起点y
             float startY = chaPos.y;
@@ -161,8 +159,6 @@ public class GameScene : MonoBehaviour
         }
         
         //todo 上面获得了最终落点y值，接下来就是根据左右移动，分别和_leftWalls（向右移动）和_rightWalls（向左移动）来得到新的x，当然不移动的话，就简单了对吧……
-        
-        //todo 最终改变角色的OnGround等状态，以及设置其正确坐标（事实上，上面这个过程我们都会在改变finalMoveTo)
         
         //最后设置新的pos
         cha.transform.position = finalMoveTo;
