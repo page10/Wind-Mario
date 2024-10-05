@@ -102,196 +102,31 @@ public class GameScene : MonoBehaviour
                 {
                     foreach (var roof in _roofs)
                     {
-                        float leftTop = roof.p0.x;
-                        float rightTop = roof.p1.x;
-                        float leftBottom = fanCollider.Left;
-                        float rightBottom = fanCollider.Right;
-                        if (leftTop > leftBottom && rightTop > rightBottom)
+                        Vector2 leftTop = roof.p0;
+                        Vector2 rightTop = roof.p1;
+                        Vector2 leftBottom = new Vector2(fanCollider.Left, fanCollider.Top);
+                        Vector2 rightBottom = new Vector2(fanCollider.Right, fanCollider.Top);
+
+                        float leftWindArea = Mathf.Max(leftTop.x, leftBottom.x);
+                        float rightWindArea = Mathf.Min(rightTop.x, rightBottom.x);
+                        float topWindArea = Mathf.Min(leftTop.y, rightTop.y);
+                        float bottomWindArea = Mathf.Max(leftBottom.y, rightBottom.y);
+                        
+                        if (rightWindArea > leftWindArea && topWindArea > bottomWindArea)
                         {
-                            float left = Mathf.Max(leftTop, leftBottom);
-                            float right = Mathf.Min(rightTop, rightBottom);
-                            if (left < right)
-                            {
-                                Debug.Log("Wind Region: " + left + " -> " + right);
-                                WindRegion region = new WindRegion(Vector2.up, fan.windSpeed,
-                                    new Vector2(left, roof.p0.y), new Vector2(right, roof.p0.y),
-                                    new Vector2(left, fanCollider.Top), new Vector2(right, fanCollider.Top));
-                                _windRegions.Add(region);
-                                
-                            }
+                            leftTop = new Vector2(leftWindArea, topWindArea);
+                            rightTop = new Vector2(rightWindArea, topWindArea);
+                            leftBottom = new Vector2(leftWindArea, bottomWindArea);
+                            rightBottom = new Vector2(rightWindArea, bottomWindArea);
+                        
+                            WindRegion region = new WindRegion(Vector2.up, fan.windSpeed, leftTop, rightTop, leftBottom, rightBottom);
+                            _windRegions.Add(region);
                         }
+                        
                     }
                 }
-                else
-                {
-                    foreach (var floor in _floors)
-                    {
-                        float leftTop = fanCollider.Left;
-                        float rightTop = fanCollider.Right;
-                        float leftBottom = floor.p0.x;
-                        float rightBottom = floor.p1.x;
-                        if (leftTop > leftBottom && rightTop > rightBottom)
-                        {
-                            float left = Mathf.Max(leftTop, leftBottom);
-                            float right = Mathf.Min(rightTop, rightBottom);
-                            if (left < right)
-                            {
-                                Debug.Log("Wind Region: " + left + " -> " + right);
-                                WindRegion region = new WindRegion(Vector2.down, fan.windSpeed,
-                                    new Vector2(left, fanCollider.Bottom), new Vector2(right, fanCollider.Bottom),
-                                    new Vector2(left, floor.p0.y), new Vector2(right, floor.p0.y));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
-            }
-            else if (fan.FanDirection == FanDirection.Down)
-            {
-                if (fan.WindDirection == WindDirection.Outward)
-                {
-                    foreach (var floor in _floors)
-                    {
-                        float leftTop = fanCollider.Left;
-                        float rightTop = fanCollider.Right;
-                        float leftBottom = floor.p0.x;
-                        float rightBottom = floor.p1.x;
-                        if (leftTop > leftBottom && rightTop > rightBottom)
-                        {
-                            float left = Mathf.Max(leftTop, leftBottom);
-                            float right = Mathf.Min(rightTop, rightBottom);
-                            if (left < right)
-                            {
-                                Debug.Log("Wind Region: " + left + " -> " + right);
-                                WindRegion region = new WindRegion(Vector2.down, fan.windSpeed,
-                                    new Vector2(left, fanCollider.Bottom), new Vector2(right, fanCollider.Bottom),
-                                    new Vector2(left, floor.p0.y), new Vector2(right, floor.p0.y));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var roof in _roofs)
-                    {
-                        float leftTop = roof.p0.x;
-                        float rightTop = roof.p1.x;
-                        float leftBottom = fanCollider.Left;
-                        float rightBottom = fanCollider.Right;
-                        if (leftTop > leftBottom && rightTop > rightBottom)
-                        {
-                            float left = Mathf.Max(leftTop, leftBottom);
-                            float right = Mathf.Min(rightTop, rightBottom);
-                            if (left < right)
-                            {
-                                Debug.Log("Wind Region: " + left + " -> " + right);
-                                WindRegion region = new WindRegion(Vector2.up, fan.windSpeed,
-                                    new Vector2(left, roof.p0.y), new Vector2(right, roof.p0.y),
-                                    new Vector2(left, fanCollider.Top), new Vector2(right, fanCollider.Top));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                } 
-            }
-            else if (fan.FanDirection == FanDirection.Left)
-            {
-                if (fan.WindDirection == WindDirection.Outward)
-                {
-                    foreach (var rightWall in _rightWalls)
-                    {
-                        float leftTop = rightWall.p0.y;
-                        float rightTop = fanCollider.Top;
-                        float leftBottom = rightWall.p1.y;
-                        float rightBottom = fanCollider.Bottom;
-                        if (leftTop < rightTop && leftBottom < rightBottom)
-                        {
-                            float top = Mathf.Min(leftTop, rightTop);
-                            float bottom = Mathf.Max(leftBottom, rightBottom);
-                            if (top > bottom)
-                            {
-                                Debug.Log("Wind Region: " + top + " -> " + bottom);
-                                WindRegion region = new WindRegion(Vector2.left, fan.windSpeed,
-                                    new Vector2(rightWall.p0.x, top), new Vector2(fanCollider.Left, top),
-                                    new Vector2(rightWall.p1.x, bottom), new Vector2(fanCollider.Left, bottom));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var leftWall in _leftWalls)
-                    {
-                        float leftTop = leftWall.p0.y;
-                        float rightTop = fanCollider.Top;
-                        float leftBottom = leftWall.p1.y;
-                        float rightBottom = fanCollider.Bottom;
-                        if (leftTop < rightTop && leftBottom < rightBottom)
-                        {
-                            float top = Mathf.Min(leftTop, rightTop);
-                            float bottom = Mathf.Max(leftBottom, rightBottom);
-                            if (top > bottom)
-                            {
-                                Debug.Log("Wind Region: " + top + " -> " + bottom);
-                                WindRegion region = new WindRegion(Vector2.right, fan.windSpeed,
-                                    new Vector2(fanCollider.Right, top), new Vector2(leftWall.p0.x, top),
-                                    new Vector2(fanCollider.Right, bottom), new Vector2(leftWall.p1.x, bottom));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
-            }
-            else if (fan.FanDirection == FanDirection.Right)
-            {
-                if (fan.WindDirection == WindDirection.Outward)
-                {
-                    foreach (var leftWall in _leftWalls)
-                    {
-                        float leftTop = leftWall.p0.y;
-                        float rightTop = fanCollider.Top;
-                        float leftBottom = leftWall.p1.y;
-                        float rightBottom = fanCollider.Bottom;
-                        if (leftTop < rightTop && leftBottom < rightBottom)
-                        {
-                            float top = Mathf.Min(leftTop, rightTop);
-                            float bottom = Mathf.Max(leftBottom, rightBottom);
-                            if (top > bottom)
-                            {
-                                Debug.Log("Wind Region: " + top + " -> " + bottom);
-                                WindRegion region = new WindRegion(Vector2.right, fan.windSpeed,
-                                    new Vector2(fanCollider.Right, top), new Vector2(leftWall.p0.x, top),
-                                    new Vector2(fanCollider.Right, bottom), new Vector2(leftWall.p1.x, bottom));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (var rightWall in _rightWalls)
-                    {
-                        float leftTop = rightWall.p0.y;
-                        float rightTop = fanCollider.Top;
-                        float leftBottom = rightWall.p1.y;
-                        float rightBottom = fanCollider.Bottom;
-                        if (leftTop < rightTop && leftBottom < rightBottom)
-                        {
-                            float top = Mathf.Min(leftTop, rightTop);
-                            float bottom = Mathf.Max(leftBottom, rightBottom);
-                            if (top > bottom)
-                            {
-                                Debug.Log("Wind Region: " + top + " -> " + bottom);
-                                WindRegion region = new WindRegion(Vector2.left, fan.windSpeed,
-                                    new Vector2(rightWall.p0.x, top), new Vector2(fanCollider.Left, top),
-                                    new Vector2(rightWall.p1.x, bottom), new Vector2(fanCollider.Left, bottom));
-                                _windRegions.Add(region);
-                            }
-                        }
-                    }
-                }
+                
+                
             }
         }
     }
@@ -478,7 +313,7 @@ private List<Segment> MergeSegments(List<Segment> segments)
     private void OnDrawGizmos()
     {
         // Set the color of the gizmos
-        Gizmos.color = Color.red;
+        Gizmos.color = Color.blue;
 
         foreach (WindRegion region in _windRegions)
         {
