@@ -5,7 +5,7 @@ public class Character : MonoBehaviour
     [SerializeField, Tooltip("作为外边框的renderer")] private SpriteRenderer sprite;
     [Tooltip("每个fixedUpdate会下落的米数，也就是重力加速度")]
     public float weight = 0.01f;
-    [HideInInspector, Tooltip("起跳的力量，按住跳每个fixed update都会往上这么多")] public float jump = 0.6f;
+    [Tooltip("起跳的力量，按住跳每个fixed update都会往上这么多")] public float jump = 0.1f;
     [Tooltip("每个FixedUpdate左右方向移动加速度")] public float moveSpeed = 0.02f;
     [Tooltip("刹车速度，也就是每个FixedUpdate减少多少")] public float speedDown = 0.05f;
     [Tooltip("最大左右移动速度")] public float maxSpeed = 0.3f;
@@ -16,7 +16,12 @@ public class Character : MonoBehaviour
     /// </summary>
     public bool OnGround { get; private set; } = false;
 
-    public void SetOnGround(bool on) => OnGround = on;
+    public void SetOnGround(bool on)
+    {
+        OnGround = on;
+        //print("OnGround: " + on + ">>>" + CurrentSpeed.y);
+        if (on) CurrentSpeed = new Vector2(CurrentSpeed.x, 0);
+    }
     
     /// <summary>
     /// 当前这个FixedUpdate要移动的速度
@@ -43,7 +48,7 @@ public class Character : MonoBehaviour
         switch (dir)
         {
             case CharacterHorizonMove.Left:
-                if (CurrentSpeed.x >= 0) CurrentSpeed = Vector2.left * moveSpeed;
+                if (CurrentSpeed.x >= 0) CurrentSpeed = Vector2.left * moveSpeed;  // that greasy feeling in mario 
                 else if (CurrentSpeed.x <= -maxSpeed + moveSpeed) CurrentSpeed = new Vector2(-maxSpeed, CurrentSpeed.y);
                 else CurrentSpeed += Vector2.left * moveSpeed;
                 break;
@@ -51,6 +56,12 @@ public class Character : MonoBehaviour
                 if (CurrentSpeed.x <= 0) CurrentSpeed = Vector2.right * moveSpeed;
                 else if (CurrentSpeed.x >= maxSpeed - moveSpeed) CurrentSpeed = new Vector2(maxSpeed, CurrentSpeed.y);
                 else CurrentSpeed += Vector2.right * moveSpeed;
+                break;
+            case CharacterHorizonMove.None:
+                if (CurrentSpeed.x > speedDown) CurrentSpeed = Vector2.left * speedDown;
+                else if (CurrentSpeed.x > 0) CurrentSpeed = Vector2.zero;
+                else if (CurrentSpeed.x < -speedDown) CurrentSpeed = Vector2.right * speedDown;
+                else if (CurrentSpeed.x < 0) CurrentSpeed = Vector2.zero;
                 break;
         }
         return transform.position.x + CurrentSpeed.x;
@@ -64,8 +75,11 @@ public class Character : MonoBehaviour
     public float VerticalMove(bool tryJumping)
     {
         //先加速度
-        CurrentSpeed = new Vector2(CurrentSpeed.x, (tryJumping ? jump : 0) + CurrentSpeed.y - weight);
-        return transform.position.y + CurrentSpeed.y;
+        OnGround = false;
+        // CurrentSpeed = new Vector2(CurrentSpeed.x, (tryJumping ? jump : 0) + CurrentSpeed.y - weight);
+        CurrentSpeed = new Vector2(CurrentSpeed.x, CurrentSpeed.y - weight);
+        bool canContinueJump = CurrentSpeed.y + jump >= 0;
+        return transform.position.y + CurrentSpeed.y + (tryJumping && canContinueJump ? jump : 0);
     }
 }
 

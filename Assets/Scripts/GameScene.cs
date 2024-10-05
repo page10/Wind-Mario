@@ -21,6 +21,7 @@ public class GameScene : MonoBehaviour
     /// 因为Start和FixedUpdate等时序问题
     /// </summary>
     private bool _gameRunning = false;
+    private bool jump = false;
 
     private void Start()
     {
@@ -61,6 +62,11 @@ public class GameScene : MonoBehaviour
             if (underPlayerControl)
             {
                 //todo 获得操作，然后给move和doJump赋值。
+                move = Input.GetAxis("Horizontal") < 0 ? CharacterHorizonMove.Left :
+                    Input.GetAxis("Horizontal") > 0 ? CharacterHorizonMove.Right : CharacterHorizonMove.None;
+                doJump = jump;
+                jump = false;
+                //print("do jump: " + doJump + ">>" + jump);
             }
             else
             {
@@ -68,6 +74,14 @@ public class GameScene : MonoBehaviour
             }
             MoveCharacter(cha, move, doJump);
         }
+        //print("movey: " + _characters[0].CurrentSpeed.y + ">> On ground: " + _characters[0].OnGround + ">> Falling: " + _characters[0].Falling);
+    }
+    
+
+
+    private void Update()
+    {
+        jump = Input.GetKey(KeyCode.Space);
     }
 
 
@@ -75,25 +89,56 @@ public class GameScene : MonoBehaviour
     /// 地图变化了，重新计算所有的墙壁等
     /// </summary>
     private void RecheckMapSegments()
+{
+    _roofs.Clear();
+    _leftWalls.Clear();
+    _rightWalls.Clear();
+    _floors.Clear();
+
+    foreach (SceneCollider c in _colliders)
     {
-        _roofs.Clear();
-        _leftWalls.Clear();
-        _rightWalls.Clear();
-        _floors.Clear();
-        
-        foreach (SceneCollider c in _colliders)
+        if (c.isFloor) _floors.Add(new Segment(new Vector2(c.Left, c.Top), new Vector2(c.Right, c.Top)));
+        if (c.isRoof) _roofs.Add(new Segment(new Vector2(c.Left, c.Bottom), new Vector2(c.Right, c.Bottom)));
+        if (c.isWall)
         {
-            if (c.isFloor) _floors.Add(new Segment(new Vector2(c.Left, c.Top), new Vector2(c.Right, c.Top)));
-            if (c.isRoof) _roofs.Add(new Segment(new Vector2(c.Left, c.Bottom), new Vector2(c.Right, c.Bottom)));
-            if (c.isWall)
-            {
-                _leftWalls.Add(new Segment(new Vector2(c.Left, c.Top), new Vector2(c.Left, c.Bottom)));
-                _rightWalls.Add(new Segment(new Vector2(c.Right, c.Top), new Vector2(c.Right, c.Bottom)));
-            }
+            _leftWalls.Add(new Segment(new Vector2(c.Left, c.Top), new Vector2(c.Left, c.Bottom)));
+            _rightWalls.Add(new Segment(new Vector2(c.Right, c.Top), new Vector2(c.Right, c.Bottom)));
         }
-        
-        //todo 现在只是单纯的加入列表，看看每个方向是否有办法把一些原本就相连的线条合并掉，比如(0,0)->(0,1)和(0,1)->(0,2)应该合并为(0,0)->(0,2)
     }
+
+    // Merge consecutive segments
+    // _floors = MergeSegments(_floors);
+    // _roofs = MergeSegments(_roofs);
+    // _leftWalls = MergeSegments(_leftWalls);
+    // _rightWalls = MergeSegments(_rightWalls);
+}
+
+private List<Segment> MergeSegments(List<Segment> segments)
+{
+    // Sort the segments by their start point
+    segments.Sort((a, b) => a.p0.x.CompareTo(b.p0.x));
+
+    List<Segment> merged = new List<Segment>();
+
+    for (int i = 0; i < segments.Count; i++)
+    {
+        // Start with the current segment
+        Segment current = segments[i];
+
+        // While the end of the current segment is the same as the start of the next segment
+        while (i < segments.Count - 1 && current.p1 == segments[i + 1].p0)
+        {
+            // Extend the current segment to the end of the next segment
+            current = new Segment(current.p0, segments[i + 1].p1);
+            i++;
+        }
+
+        // Add the merged segment to the result
+        merged.Add(current);
+    }
+
+    return merged;
+}
 
     /// <summary>
     /// 单个角色的行动（每一帧使用）
@@ -109,7 +154,7 @@ public class GameScene : MonoBehaviour
             cha.VerticalMove(doJump)
         );
         Vector2 finalMoveTo = wishToPos;
-        bool finalOnGround = true;
+        bool finalOnGround = false;
         
         //角色本fixedUpdate的移动脚下中心“射线”
         Segment chaMove = new Segment(chaPos, wishToPos);
@@ -127,7 +172,21 @@ public class GameScene : MonoBehaviour
         //todo 如果上升中（rising），就要获得是否撞到天花板了（当然是最接近自己脑袋的天花板），所有的天花板线_roof
         if (rising)
         {
-            
+            float nearestY = wishToPos.y;
+            Segment[] check = new Segment[] { chaHeadTop, chaLeftHeadMove, chaRightHeadMove };
+            foreach (Segment roof in _roofs)
+            {
+                foreach (Segment moveSeg in check)
+                {
+                    if (Geometry.SegmentIntersecting(moveSeg, roof, out Vector2 roofPoint))
+                    {
+                        finalOnGround = false;
+                        nearestY = Mathf.Min(nearestY, roof.p0.y - cha.ColliderHeight.y - 0.001f);
+                    }
+                }
+            }
+            //到此，移动结果的y坐标确定，并且最终是否撞到天花板确定了
+            finalMoveTo = new Vector2(finalMoveTo.x, nearestY);
         }
         //如果下落中（falling，非rising即falling），就要判断是否落地了（最接近的地面就是落地）
         else
@@ -158,7 +217,39 @@ public class GameScene : MonoBehaviour
             
         }
         
+        bool isLeft = wishToPos.x <= chaPos.x; //是否向左移动
+        bool isRight = wishToPos.x >= chaPos.x; //是否向右移动
+        
         //todo 上面获得了最终落点y值，接下来就是根据左右移动，分别和_leftWalls（向右移动）和_rightWalls（向左移动）来得到新的x，当然不移动的话，就简单了对吧……
+        if (isLeft)
+        {
+            Segment[] check = new Segment[] {chaLeftFootMove, chaLeftHeadMove };
+            foreach (Segment wall in _rightWalls)
+            {
+                foreach (Segment moveSeg in check)
+                {
+                    if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
+                    {
+                        finalMoveTo = new Vector2(wall.p0.x - cha.FootLeftPlus.x + 0.001f, finalMoveTo.y);
+                    }
+                }
+            }
+        }
+        else if (isRight)
+        {
+            Segment[] check = new Segment[] {chaRightFootMove, chaRightHeadMove };
+            foreach (Segment wall in _leftWalls)
+            {
+                foreach (Segment moveSeg in check)
+                {
+                    if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
+                    {
+                        finalMoveTo = new Vector2(wall.p0.x - cha.FootRightPlus.x - 0.001f, finalMoveTo.y);
+                    }
+                }
+            }
+        }
+
         
         //最后设置新的pos
         cha.transform.position = finalMoveTo;
