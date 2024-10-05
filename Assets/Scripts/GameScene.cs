@@ -100,30 +100,70 @@ public class GameScene : MonoBehaviour
             {
                 if (fan.WindDirection == WindDirection.Outward)
                 {
+
+                    List<Vector2> points = new List<Vector2>();
                     foreach (var roof in _roofs)
                     {
-                        Vector2 leftTop = roof.p0;
-                        Vector2 rightTop = roof.p1;
-                        Vector2 leftBottom = new Vector2(fanCollider.Left, fanCollider.Top);
-                        Vector2 rightBottom = new Vector2(fanCollider.Right, fanCollider.Top);
-
-                        float leftWindArea = Mathf.Max(leftTop.x, leftBottom.x);
-                        float rightWindArea = Mathf.Min(rightTop.x, rightBottom.x);
-                        float topWindArea = Mathf.Min(leftTop.y, rightTop.y);
-                        float bottomWindArea = Mathf.Max(leftBottom.y, rightBottom.y);
-                        
-                        if (rightWindArea > leftWindArea && topWindArea > bottomWindArea)
-                        {
-                            leftTop = new Vector2(leftWindArea, topWindArea);
-                            rightTop = new Vector2(rightWindArea, topWindArea);
-                            leftBottom = new Vector2(leftWindArea, bottomWindArea);
-                            rightBottom = new Vector2(rightWindArea, bottomWindArea);
-                        
-                            WindRegion region = new WindRegion(Vector2.up, fan.windSpeed, leftTop, rightTop, leftBottom, rightBottom);
-                            _windRegions.Add(region);
-                        }
-                        
+                        points.Add(roof.p0);
+                        points.Add(roof.p1);
                     }
+                    // sort points according to their x
+                    points.Sort((p1, p2) => p1.x.CompareTo(p2.x));
+                    // remove points that y < fanCollider.Top
+                    points.RemoveAll(p => p.y < fanCollider.Top);
+                    // remove points that x < fanCollider.Left or x > fanCollider.Right
+                    points.RemoveAll(p => p.x < fanCollider.Left || p.x > fanCollider.Right);
+                    // add fanCollider left and right sides
+                    points.Add(new Vector2(fanCollider.Left, fanCollider.Bottom));
+                    points.Add(new Vector2(fanCollider.Right, fanCollider.Bottom));
+                    // sort points according to their x again
+                    points.Sort((p1, p2) => p1.x.CompareTo(p2.x));
+                    List<Vector2> pointsOnFan = new List<Vector2>();
+                    
+                    // map the points on fan
+                    foreach (var point in points)
+                    {
+                        pointsOnFan.Add(new Vector2(point.x, fanCollider.Bottom));
+                    }
+                    pointsOnFan.Sort((p1, p2) => p1.x.CompareTo(p2.x));
+
+                    List<Segment> heights = new List<Segment>();
+                    // find nearest roof of each pointOnFan
+                    for (int i = 0; i < pointsOnFan.Count - 1; i++)
+                    {
+                        float nearestY = 999f;  // count down
+                        Vector2 tempMiddle = new Vector2(pointsOnFan[i].x, (pointsOnFan[i].y + pointsOnFan[i + 1].y) / 2);
+                        Segment tempLongest = new Segment(tempMiddle, new Vector2(pointsOnFan[i].x, nearestY));
+                        foreach (var roof in _roofs)
+                        {
+                            if (Geometry.SegmentIntersecting(tempLongest, roof, out Vector2 roofPoint))
+                            {
+                                // if (roof.p0.y > tempMiddle.y)
+                                // {
+                                    nearestY = Mathf.Min(nearestY, roof.p0.y);
+                                    tempLongest = new Segment(tempMiddle, new Vector2(tempMiddle.x, nearestY));
+                                // }
+                            }
+                        }
+                        heights.Add(tempLongest);
+                    }
+
+
+                    // calculate wind regions
+                    for (int i = 0; i < pointsOnFan.Count - 1; i++)
+                    {
+                        Vector2 BottomLeft = pointsOnFan[i];
+                        Vector2 TopLeft = new Vector2(pointsOnFan[i].x, heights[i].p1.y);
+                        Vector2 BottomRight = pointsOnFan[i + 1];
+                        Vector2 TopRight = new Vector2(pointsOnFan[i + 1].x, heights[i].p1.y);
+                        
+
+                        
+                        WindRegion newRegion = new WindRegion(Vector2.up, fan.windSpeed, TopLeft, TopRight, BottomLeft, BottomRight);
+                        newRegion.SetWindDirection(fan.WindDirection, fan.FanDirection);
+                        _windRegions.Add(newRegion);
+                    }
+                    
                 }
                 
                 

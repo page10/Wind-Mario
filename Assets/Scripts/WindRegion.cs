@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class WindRegion
 {
-    public Vector2 WindDirection { get; private set; }
+    public Vector2 WindDirectionV2 { get; private set; }
     public float WindSpeed { get; private set; }
     public Vector2 LeftTop { get; private set; }
     public Vector2 RightTop { get; private set; }
     public Vector2 LeftBottom { get; private set; }
     public Vector2 RightBottom { get; private set; }
     
-    public WindRegion(Vector2 windDirection, float windSpeed, Vector2 leftTop, Vector2 rightTop, Vector2 leftBottom, Vector2 rightBottom)
+    public WindRegion(Vector2 windDirectionV2, float windSpeed, Vector2 leftTop, Vector2 rightTop, Vector2 leftBottom, Vector2 rightBottom)
     {
-        WindDirection = windDirection;
+        WindDirectionV2 = windDirectionV2;
         WindSpeed = windSpeed;
         LeftTop = leftTop;
         RightTop = rightTop;
@@ -21,9 +21,46 @@ public class WindRegion
         RightBottom = rightBottom;
     }
     
-    public void SetWindDirection(Vector2 windDirection)
+    public void SetWindDirection(WindDirection 
+        windDirectionEnum, FanDirection fanDirectionEnum)
     {
-        WindDirection = windDirection;
+        switch (windDirectionEnum)
+        {
+            case global::WindDirection.Outward:
+                switch (fanDirectionEnum)
+                {
+                    case FanDirection.Up:
+                        WindDirectionV2 = Vector2.up;
+                        break;
+                    case FanDirection.Down:
+                        WindDirectionV2 = Vector2.down;
+                        break;
+                    case FanDirection.Left:
+                        WindDirectionV2 = Vector2.left;
+                        break;
+                    case FanDirection.Right:
+                        WindDirectionV2 = Vector2.right;
+                        break;
+                }
+                break;
+            case global::WindDirection.Inward:
+                switch (fanDirectionEnum)
+                {
+                    case FanDirection.Up:
+                        WindDirectionV2 = Vector2.down;
+                        break;
+                    case FanDirection.Down:
+                        WindDirectionV2 = Vector2.up;
+                        break;
+                    case FanDirection.Left:
+                        WindDirectionV2 = Vector2.right;
+                        break;
+                    case FanDirection.Right:
+                        WindDirectionV2 = Vector2.left;
+                        break;
+                }
+                break;
+        }
     }
     
     public void SetWindSpeed(float windSpeed)
