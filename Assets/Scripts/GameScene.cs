@@ -450,6 +450,7 @@ public class GameScene : MonoBehaviour
             cha.HorizontalMove(dir),
             cha.VerticalMove(doJump)
         );
+        wishToPos += CalculateWindSpeed(chaPos);
         Vector2 finalMoveTo = wishToPos;
         bool finalOnGround = false;
 
@@ -556,7 +557,21 @@ public class GameScene : MonoBehaviour
         cha.transform.position = finalMoveTo;
         cha.SetOnGround(finalOnGround);
     }
+    
+public Vector2 CalculateWindSpeed(Vector2 characterPosition)
+{
+    Vector2 totalWindSpeed = Vector2.zero;
 
+    foreach (WindRegion region in _windRegions)
+    {
+        if (region.IsPointInside(characterPosition))
+        {
+            totalWindSpeed += region.WindDirectionV2 * region.WindSpeed;
+        }
+    }
+
+    return totalWindSpeed;
+}
     private void OnDrawGizmos()
     {
         // Set the color of the gizmos

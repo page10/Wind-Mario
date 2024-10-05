@@ -87,4 +87,10 @@ public class WindRegion
     {
         RightBottom = rightBottom;
     }
+
+    public bool IsPointInside(Vector2 point)
+    {
+        return point.x >= LeftBottom.x && point.x <= RightTop.x && point.y >= LeftBottom.y && point.y <= RightTop.y;
+    }
+
 }

@@ -179,6 +179,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: WindRight
       objectReference: {fileID: 0}
+    - target: {fileID: 8265551160655832589, guid: 8aa9e1aca2157134db3cf9d4753d1b63, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -192,6 +196,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1434545269196385360, guid: 656030e901759744fa442c8db0cf8adc, type: 3}
+      propertyPath: windSpeed
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3155086136251285605, guid: 656030e901759744fa442c8db0cf8adc, type: 3}
       propertyPath: m_Size.y
       value: 2.9940867
