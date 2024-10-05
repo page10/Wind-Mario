@@ -21,13 +21,15 @@ public class GameScene : MonoBehaviour
     private List<Segment> _rightWalls = new List<Segment>();
     private List<Segment> _floors = new List<Segment>();
 
-
+    
     /// <summary>
     /// 因为Start和FixedUpdate等时序问题
     /// </summary>
     private bool _gameRunning = false;
 
     private bool jump = false;
+    private bool _hitLeftWall = false;
+    private bool _hitRightWall = false;
 
     private void Start()
     {
@@ -552,6 +554,7 @@ public class GameScene : MonoBehaviour
                     if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
                     {
                         finalMoveTo = new Vector2(wall.p0.x - cha.FootLeftPlus.x + 0.001f, finalMoveTo.y);
+                        _hitLeftWall = true;
                     }
                 }
             }
@@ -566,15 +569,27 @@ public class GameScene : MonoBehaviour
                     if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
                     {
                         finalMoveTo = new Vector2(wall.p0.x - cha.FootRightPlus.x - 0.001f, finalMoveTo.y);
+                        _hitRightWall = true;
                     }
                 }
             }
         }
-
+        
+        cha.SetTouchingWall(_hitLeftWall,_hitRightWall);
+        
+        if (_hitLeftWall && isRight)
+        {
+            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+        }
+        else if (_hitRightWall && isLeft)
+        {
+            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+        }
 
         //最后设置新的pos
         cha.transform.position = finalMoveTo;
         cha.SetOnGround(finalOnGround);
+        cha.SetTouchingWall(false, false);
     }
     
 public Vector2 CalculateWindSpeed(Vector2 characterPosition)
