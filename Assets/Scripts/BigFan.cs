@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class BigFan : MonoBehaviour
 {
     public float windSpeed = 0.1f;
-    [SerializeField] private WindDirection windDirection = WindDirection.Outward;
-    [SerializeField] private FanDirection fanDirection = FanDirection.Up;
+    [FormerlySerializedAs("windDirection")] public WindDirection WindDirection = WindDirection.Outward;
+    [FormerlySerializedAs("fanDirection")] public FanDirection FanDirection = FanDirection.Up;
+
+    
+    
 }
 
 public enum WindDirection

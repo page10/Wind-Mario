@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4910761225390940199}
   - component: {fileID: 3155086136251285605}
   - component: {fileID: 1434545269196385360}
+  - component: {fileID: -6337398344713256466}
   m_Layer: 0
   m_Name: WindUp
   m_TagString: Untagged
@@ -100,3 +101,19 @@ MonoBehaviour:
   windSpeed: 0.1
   windDirection: 1
   fanDirection: 0
+--- !u!114 &-6337398344713256466
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8265551160655832589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a723cc1535cb304d9de9a79bdf189bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sprite: {fileID: 3155086136251285605}
+  isFloor: 0
+  isWall: 0
+  isRoof: 0
