@@ -12,8 +12,10 @@ public class GameScene : MonoBehaviour
     private readonly List<Character> _characters = new List<Character>();
     private List<BigFan> _fans = new List<BigFan>();
     private List<WindRegion> _windRegions = new List<WindRegion>();
-    
-    private Vector2 rebornPoint;
+    private List<ButtonWind> _buttons = new List<ButtonWind>();
+    private int _buttonPressed = 0;
+    private Vector2 _rebornPoint;
+
 
     // 所有的天花板、地板等，在赋值完成时最好重新算一遍
     private List<Segment> _roofs = new List<Segment>();
@@ -21,7 +23,7 @@ public class GameScene : MonoBehaviour
     private List<Segment> _rightWalls = new List<Segment>();
     private List<Segment> _floors = new List<Segment>();
 
-    
+
     /// <summary>
     /// 因为Start和FixedUpdate等时序问题
     /// </summary>
@@ -30,7 +32,6 @@ public class GameScene : MonoBehaviour
     private bool jump = false;
     private bool _hitLeftWall = false;
     private bool _hitRightWall = false;
-
     private void Start()
     {
         //游戏开始的时候从场景拿到所有配置好的collider
@@ -63,22 +64,59 @@ public class GameScene : MonoBehaviour
         }
 
         CalculateWindRegions();
-        
+
+        // get all buttons
+        _buttons.Clear();
+        ButtonWind[] buttons = GameObject.FindObjectsOfType<ButtonWind>();
+        foreach (var button in buttons)
+        {
+            button.ResetButton();
+            _buttons.Add(button);
+            GetButtonSegments(button);
+        }
+
         // reborn point
-        rebornPoint = FindObjectOfType<RebornPoint>().gameObject.transform.position;
+        _rebornPoint = FindObjectOfType<RebornPoint>().gameObject.transform.position;
         PlayerReborn();
 
         //最后开始运行游戏逻辑
         _gameRunning = true;
     }
     
+    private void GetButtonSegments(ButtonWind button)
+    {
+        SceneCollider buttonCollider = button.gameObject.GetComponent<SceneCollider>();
+        List<Segment> thisButtonSegments = new List<Segment>();
+        thisButtonSegments.Add(new Segment(new Vector2(buttonCollider.Left, buttonCollider.Top),
+            new Vector2(buttonCollider.Right, buttonCollider.Top)));
+        thisButtonSegments.Add(new Segment(new Vector2(buttonCollider.Left, buttonCollider.Bottom),
+            new Vector2(buttonCollider.Right, buttonCollider.Bottom)));
+        thisButtonSegments.Add(new Segment(new Vector2(buttonCollider.Left, buttonCollider.Top),
+            new Vector2(buttonCollider.Left, buttonCollider.Bottom)));
+        thisButtonSegments.Add(new Segment(new Vector2(buttonCollider.Right, buttonCollider.Top),
+            new Vector2( buttonCollider.Right, buttonCollider.Bottom)));
+        button.SetSegments(thisButtonSegments);
+    }
+
     private void PlayerReborn()
     {
         foreach (Character cha in _characters)
         {
-            cha.transform.position = rebornPoint;
+            cha.transform.position = _rebornPoint;
             cha.SetOnGround(false);
         }
+
+        foreach (var button in _buttons)
+        {
+            button.ResetButton();
+        }
+
+        foreach (var fan in _fans)
+        {
+            fan.ResetwindDirection();
+        }
+        
+        _buttonPressed = 0;
     }
 
     private void FixedUpdate()
@@ -113,6 +151,7 @@ public class GameScene : MonoBehaviour
 
     private void CalculateWindRegions() // use this every time we change wind
     {
+        _windRegions.Clear();
         foreach (BigFan fan in _fans)
         {
             SceneCollider fanCollider = fan.gameObject.GetComponent<SceneCollider>();
@@ -229,10 +268,8 @@ public class GameScene : MonoBehaviour
                     {
                         if (Geometry.SegmentIntersecting(tempLongest, floor, out Vector2 floorPoint))
                         {
-
                             nearestY = Mathf.Max(nearestY, floor.p0.y);
                             tempLongest = new Segment(tempMiddle, new Vector2(tempMiddle.x, nearestY));
-
                         }
                     }
 
@@ -291,21 +328,20 @@ public class GameScene : MonoBehaviour
                     float nearestX = -999f; // left
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x,
                         pointsOnFan[i].y + (pointsOnFan[i + 1].y - pointsOnFan[i].y) / 2);
-                    Segment tempLongest = new Segment(new Vector2(nearestX,tempMiddle.y), tempMiddle);
+                    Segment tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
                     foreach (var rightWall in _rightWalls)
                     {
-                        if (rightWall.p0.x < fanCollider.Left && Geometry.SegmentIntersecting(tempLongest, rightWall, out Vector2 roofPoint))
+                        if (rightWall.p0.x < fanCollider.Left &&
+                            Geometry.SegmentIntersecting(tempLongest, rightWall, out Vector2 roofPoint))
                         {
-
                             nearestX = Mathf.Max(nearestX, rightWall.p0.x);
-                            tempLongest = new Segment(new Vector2(nearestX,tempMiddle.y), tempMiddle);
-
+                            tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
                         }
                     }
 
                     heights.Add(tempLongest);
                 }
-                
+
                 // calculate wind regions
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
@@ -319,11 +355,9 @@ public class GameScene : MonoBehaviour
                     newRegion.SetWindDirection(fan.WindDirection, fan.FanDirection);
                     _windRegions.Add(newRegion);
                 }
-                
             }
             else if (fan.FanDirection == FanDirection.Right)
             {
-                
                 List<Vector2> points = new List<Vector2>();
                 foreach (var leftwall in _leftWalls)
                 {
@@ -359,21 +393,20 @@ public class GameScene : MonoBehaviour
                     float nearestX = 999f; // right
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x,
                         pointsOnFan[i].y + (pointsOnFan[i + 1].y - pointsOnFan[i].y) / 2);
-                    Segment tempLongest = new Segment(new Vector2(nearestX,tempMiddle.y), tempMiddle);
+                    Segment tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
                     foreach (var leftWall in _leftWalls)
                     {
-                        if (leftWall.p0.x > fanCollider.Right && Geometry.SegmentIntersecting(tempLongest, leftWall, out Vector2 roofPoint))
+                        if (leftWall.p0.x > fanCollider.Right &&
+                            Geometry.SegmentIntersecting(tempLongest, leftWall, out Vector2 roofPoint))
                         {
-
                             nearestX = Mathf.Min(nearestX, leftWall.p0.x);
-                            tempLongest = new Segment(new Vector2(nearestX,tempMiddle.y), tempMiddle);
-
+                            tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
                         }
                     }
 
                     heights.Add(tempLongest);
                 }
-                
+
                 // calculate wind regions
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
@@ -387,7 +420,6 @@ public class GameScene : MonoBehaviour
                     newRegion.SetWindDirection(fan.WindDirection, fan.FanDirection);
                     _windRegions.Add(newRegion);
                 }
-
             }
         }
     }
@@ -396,12 +428,25 @@ public class GameScene : MonoBehaviour
     private void Update()
     {
         jump = Input.GetKey(KeyCode.Space);
-        if (Input.GetKeyDown(KeyCode.R))  // Press R to reborn
+        if (Input.GetKeyDown(KeyCode.R)) // Press R to reborn
         {
             PlayerReborn();
         }
     }
-
+    
+    private void PressButton(ButtonWind button)
+    {
+        button.PressButton();
+        // change wind direction according to button
+        foreach (var fan in _fans)
+        {
+            fan.WindDirection = button.Type == ButtonType.Inward ? WindDirection.Inward : WindDirection.Outward;
+            fan.SetSprite();
+        }
+        CalculateWindRegions();
+        _buttonPressed++;
+    }
+    
 
     /// <summary>
     /// 地图变化了，重新计算所有的墙壁等
@@ -423,6 +468,7 @@ public class GameScene : MonoBehaviour
                 _rightWalls.Add(new Segment(new Vector2(c.Right, c.Top), new Vector2(c.Right, c.Bottom)));
             }
         }
+        
 
         // Merge consecutive segments
         // _floors = MergeSegments(_floors);
@@ -554,7 +600,6 @@ public class GameScene : MonoBehaviour
                     if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
                     {
                         finalMoveTo = new Vector2(wall.p0.x - cha.FootLeftPlus.x + 0.001f, finalMoveTo.y);
-                        _hitLeftWall = true;
                     }
                 }
             }
@@ -569,11 +614,16 @@ public class GameScene : MonoBehaviour
                     if (Geometry.SegmentIntersecting(moveSeg, wall, out Vector2 wallPoint))
                     {
                         finalMoveTo = new Vector2(wall.p0.x - cha.FootRightPlus.x - 0.001f, finalMoveTo.y);
-                        _hitRightWall = true;
                     }
                 }
             }
         }
+
+        // check button pressed
+        Segment finalMoveTrace = new Segment(chaPos, finalMoveTo);
+        CheckButtonPressed(finalMoveTrace);
+        
+      //最后设置新的pos
         
         cha.SetTouchingWall(_hitLeftWall,_hitRightWall);
         
@@ -591,21 +641,40 @@ public class GameScene : MonoBehaviour
         cha.SetOnGround(finalOnGround);
         cha.SetTouchingWall(false, false);
     }
-    
-public Vector2 CalculateWindSpeed(Vector2 characterPosition)
-{
-    Vector2 totalWindSpeed = Vector2.zero;
 
-    foreach (WindRegion region in _windRegions)
+    public Vector2 CalculateWindSpeed(Vector2 characterPosition)
     {
-        if (region.IsPointInside(characterPosition))
+        Vector2 totalWindSpeed = Vector2.zero;
+
+        foreach (WindRegion region in _windRegions)
         {
-            totalWindSpeed += region.WindDirectionV2 * region.WindSpeed;
+            if (region.IsPointInside(characterPosition))
+            {
+                totalWindSpeed += region.WindDirectionV2 * region.WindSpeed;
+            }
+        }
+
+        return totalWindSpeed;
+    }
+
+    private void CheckButtonPressed(Segment finalMoveTrace)
+    {
+        foreach (var button in _buttons)
+        {
+            if (button.Status == ButtonStatus.Normal)
+            {
+                foreach (var VARIABLE in button.GetSegments())
+                {
+                    if (Geometry.SegmentIntersecting(finalMoveTrace, VARIABLE, out Vector2 point))
+                    {
+                        PressButton(button);
+                        break;
+                    }   
+                }
+            }
         }
     }
 
-    return totalWindSpeed;
-}
     private void OnDrawGizmos()
     {
         // Set the color of the gizmos

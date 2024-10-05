@@ -77,4 +77,23 @@ public static class Geometry
 
         return res;
     }
+    
+    public static bool PointInTriangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c)
+    {
+        float denominator = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+        float a1 = ((b.y - c.y) * (p.x - c.x) + (c.x - b.x) * (p.y - c.y)) / denominator;
+        float a2 = ((c.y - a.y) * (p.x - c.x) + (a.x - c.x) * (p.y - c.y)) / denominator;
+        float a3 = 1 - a1 - a2;
+        return a1 >= 0 && a1 <= 1 && a2 >= 0 && a2 <= 1 && a3 >= 0 && a3 <= 1;
+    }
+    
+    public static bool PointInRectangle(Vector2 p, Vector2 a, Vector2 b, Vector2 c, Vector2 d)
+    {
+        return PointInTriangle(p, a, b, c) || PointInTriangle(p, a, c, d);
+    }
+    
+    public static bool PointInRectangle(Vector2 p, float left, float right, float top, float bottom)
+    {
+        return p.x >= left && p.x <= right && p.y >= bottom && p.y <= top;
+    }
 }

@@ -101,6 +101,9 @@ MonoBehaviour:
   windSpeed: 0.1
   WindDirection: 1
   FanDirection: 3
+  spriteRenderer: {fileID: 3155086136251285605}
+  spriteInward: {fileID: 1294638522, guid: 2bb3be9602f01cc4aaf8c9437554a40b, type: 3}
+  spriteOutward: {fileID: 1307774419, guid: 2bb3be9602f01cc4aaf8c9437554a40b, type: 3}
 --- !u!114 &-6337398344713256466
 MonoBehaviour:
   m_ObjectHideFlags: 0
