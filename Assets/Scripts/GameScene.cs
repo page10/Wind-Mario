@@ -15,6 +15,7 @@ public class GameScene : MonoBehaviour
     private List<ButtonWind> _buttons = new List<ButtonWind>();
     private int _buttonPressed = 0;
     private Vector2 _rebornPoint;
+    private Cage _cage;
 
 
     // 所有的天花板、地板等，在赋值完成时最好重新算一遍
@@ -73,11 +74,15 @@ public class GameScene : MonoBehaviour
             _buttons.Add(button);
             GetButtonSegments(button);
         }
+        // cage
+        _cage = FindObjectOfType<Cage>();
+        
 
         // reborn point
         _rebornPoint = FindObjectOfType<RebornPoint>().gameObject.transform.position;
         PlayerReborn();
-
+        
+        
         //最后开始运行游戏逻辑
         _gameRunning = true;
     }
@@ -114,6 +119,8 @@ public class GameScene : MonoBehaviour
         {
             fan.ResetwindDirection();
         }
+        
+        _cage.ResetCage();
         
         _buttonPressed = 0;
     }
@@ -436,6 +443,7 @@ public class GameScene : MonoBehaviour
     private void PressButton(ButtonWind button)
     {
         button.PressButton();
+        _cage.AddLightOnCount();
         // change wind direction according to button
         foreach (var fan in _fans)
         {
