@@ -12,6 +12,8 @@ public class GameScene : MonoBehaviour
     private readonly List<Character> _characters = new List<Character>();
     private List<BigFan> _fans = new List<BigFan>();
     private List<WindRegion> _windRegions = new List<WindRegion>();
+    
+    private Vector2 rebornPoint;
 
     // 所有的天花板、地板等，在赋值完成时最好重新算一遍
     private List<Segment> _roofs = new List<Segment>();
@@ -59,9 +61,22 @@ public class GameScene : MonoBehaviour
         }
 
         CalculateWindRegions();
+        
+        // reborn point
+        rebornPoint = FindObjectOfType<RebornPoint>().gameObject.transform.position;
+        PlayerReborn();
 
         //最后开始运行游戏逻辑
         _gameRunning = true;
+    }
+    
+    private void PlayerReborn()
+    {
+        foreach (Character cha in _characters)
+        {
+            cha.transform.position = rebornPoint;
+            cha.SetOnGround(false);
+        }
     }
 
     private void FixedUpdate()
@@ -379,6 +394,10 @@ public class GameScene : MonoBehaviour
     private void Update()
     {
         jump = Input.GetKey(KeyCode.Space);
+        if (Input.GetKeyDown(KeyCode.R))  // Press R to reborn
+        {
+            PlayerReborn();
+        }
     }
 
 
