@@ -1,14 +1,21 @@
+using System;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class Character : MonoBehaviour
 {
     [SerializeField, Tooltip("作为外边框的renderer")] private SpriteRenderer sprite;
-    [Tooltip("是否接受玩家操作")] public bool playerControl = true;
+    [SerializeField]private SkeletonAnimation image;
+    private string _currentAction;
+    private SkeletonData _imageData;
+    private MeshRenderer _meshRenderer;
     // X轴控制变量
     [Tooltip("每个FixedUpdate左右方向移动加速度")] public float moveSpeed = 0.02f;
     [Tooltip("刹车速度，也就是每个FixedUpdate减少多少")] public float speedDown = 0.05f;
     [Tooltip("最大左右移动速度")] public float maxSpeed = 0.3f;
+    [Tooltip("是否接受玩家操作")] public bool playerControl = true;
+
     [Tooltip("最小速度，小于这个速度就停止")] public float minSpeed = 0.01f;
     [Tooltip("空中减速系数")] public float airSpeedDown = 0.5f;
     // Y轴控制变量
@@ -83,6 +90,7 @@ public class Character : MonoBehaviour
         }
         return transform.position.x + CurrentSpeed.x;
     }
+
     /// <summary>
     /// 纵向移动，和HorizontalMove一起得到了这一帧期待的坐标点
     /// </summary>
@@ -128,6 +136,24 @@ public class Character : MonoBehaviour
         IsTouchingRightWall = touchingRight;
     }
 
+
+    private void Start()
+    {
+        _imageData = image.SkeletonDataAsset.GetSkeletonData(true);
+        _meshRenderer = image.GetComponent<MeshRenderer>();
+        _meshRenderer.material = new Material(_meshRenderer.material);
+    }
+    
+    public void ChangeAction(string action, bool loop = true)
+    {
+        if (_currentAction == action) return;
+        Spine.Animation sa = _imageData?.FindAnimation(action);
+        
+        if (sa == null) return;
+        Debug.Log("ChangeAction: " + action + ">>>" + sa);
+        image.AnimationState.SetAnimation(0, action, loop);
+        _currentAction = action;
+    }
 }
 
 /// <summary>

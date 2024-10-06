@@ -223,7 +223,7 @@ public class GameScene : MonoBehaviour
                 // find nearest roof of each pointOnFan
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
-                    float nearestY = 999f; // count down
+                    float nearestY = fan.maxRange; // count down
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x, (pointsOnFan[i].y + pointsOnFan[i + 1].y) / 2);
                     Segment tempLongest = new Segment(tempMiddle, new Vector2(pointsOnFan[i].x, nearestY));
                     foreach (var roof in _roofs)
@@ -293,7 +293,7 @@ public class GameScene : MonoBehaviour
 
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
-                    float nearestY = -999f; // count down
+                    float nearestY = -fan.maxRange; // count down
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x + (pointsOnFan[i + 1].x - pointsOnFan[i].x) / 2,
                         pointsOnFan[i].y);
                     Segment tempLongest = new Segment(tempMiddle, new Vector2(pointsOnFan[i].x, nearestY));
@@ -358,7 +358,7 @@ public class GameScene : MonoBehaviour
                 // find nearest wall of each pointOnFan
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
-                    float nearestX = -999f; // left
+                    float nearestX = -fan.maxRange; // left
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x,
                         pointsOnFan[i].y + (pointsOnFan[i + 1].y - pointsOnFan[i].y) / 2);
                     Segment tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
@@ -423,7 +423,7 @@ public class GameScene : MonoBehaviour
                 // find nearest wall of each pointOnFan
                 for (int i = 0; i < pointsOnFan.Count - 1; i++)
                 {
-                    float nearestX = 999f; // right
+                    float nearestX = fan.maxRange; // right
                     Vector2 tempMiddle = new Vector2(pointsOnFan[i].x,
                         pointsOnFan[i].y + (pointsOnFan[i + 1].y - pointsOnFan[i].y) / 2);
                     Segment tempLongest = new Segment(new Vector2(nearestX, tempMiddle.y), tempMiddle);
@@ -742,6 +742,34 @@ public class GameScene : MonoBehaviour
 
         //最后设置新的pos
         cha.transform.position = finalMoveTo;
+        string chaSpineAction = "idle";
+        if (!finalOnGround)
+        {
+            if (!rising)
+            {
+                chaSpineAction = "hoverboard";
+            }
+            else
+            {
+                chaSpineAction = "jump";
+            }
+        }
+        else if (Mathf.Abs(finalMoveTrace.p1.x - finalMoveTrace.p0.x) > 0.001f)
+        {
+            chaSpineAction = "run";
+        }
+        
+        // change transform accrording to the final move
+        if (finalMoveTo.x > chaPos.x)
+        {
+            cha.transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (finalMoveTo.x < chaPos.x)
+        {
+            cha.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        
+        cha.ChangeAction(chaSpineAction, true);
         cha.SetOnGround(finalOnGround);
         cha.SetTouchingWall(false, false);
     }
