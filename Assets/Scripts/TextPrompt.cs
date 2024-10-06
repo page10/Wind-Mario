@@ -12,8 +12,8 @@ public class TextPrompt : MonoBehaviour
 
     private void Start()
     {
-        SetTextAlpha(1);
-        promptText.text = "这段文字应该在测试的时候被替换掉. 现在显示是应该的, 因为Alpha是1";
+        SetTextAlpha(0);
+        // promptText.text = "这段文字应该在测试的时候被替换掉. 现在显示是应该的, 因为Alpha是1";
     }
 
     public void ShowText(string message)
