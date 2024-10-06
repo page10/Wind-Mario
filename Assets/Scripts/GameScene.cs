@@ -16,6 +16,8 @@ public class GameScene : MonoBehaviour
     private int _buttonPressed = 0;
     private Vector2 _rebornPoint;
     private Cage _cage;
+    public GameObject _escapeDoor;
+    private bool _escapeDoorOpen = false;
 
 
     // 所有的天花板、地板等，在赋值完成时最好重新算一遍
@@ -76,6 +78,9 @@ public class GameScene : MonoBehaviour
         }
         // cage
         _cage = FindObjectOfType<Cage>();
+        
+        // escape door
+        _escapeDoor.SetActive(false);
         
 
         // reborn point
@@ -438,12 +443,14 @@ public class GameScene : MonoBehaviour
         {
             PlayerReborn();
         }
+        CheckEscape();
     }
     
     private void PressButton(ButtonWind button)
     {
         button.PressButton();
         _cage.AddLightOnCount();
+        _buttonPressed++;
         // change wind direction according to button
         foreach (var fan in _fans)
         {
@@ -451,7 +458,20 @@ public class GameScene : MonoBehaviour
             fan.SetSprite();
         }
         CalculateWindRegions();
-        _buttonPressed++;
+        if (_buttonPressed == _buttons.Count)
+        {
+            _cage.OpenCage();
+            _escapeDoorOpen = true;
+            _escapeDoor.SetActive(true);
+        }
+    }
+    
+    private void CheckEscape()
+    {
+        if (_escapeDoorOpen && Vector2.Distance(_characters[0].transform.position, _escapeDoor.transform.position) < 1)
+        {
+            Debug.Log("You Win!");
+        }
     }
     
 

@@ -33,7 +33,6 @@ public class Cage : MonoBehaviour
         else if (lightOnCount == 3)
         {
             light3sprite.sprite = lightOn;
-            OpenCage();
         }
     }
     
