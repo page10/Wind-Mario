@@ -36,8 +36,8 @@ public class GameScene : MonoBehaviour
     private bool _gameRunning = false;
 
     private bool jump = false;
-    private bool _hitLeftWall = false;
-    private bool _hitRightWall = false;
+    // private bool _hitLeftWall = false;
+    // private bool _hitRightWall = false;
     private void Start()
     {
         //游戏开始的时候从场景拿到所有配置好的collider
@@ -477,7 +477,7 @@ public class GameScene : MonoBehaviour
         _cage.AddLightOnCount();
         _buttonPressed++;
         // change wind direction according to button
-        foreach (var fan in button.GetControlledFans())
+        foreach (var fan in _fans)
         {   
             fan.WindDirection = button.Type == ButtonType.Inward ? WindDirection.Inward : WindDirection.Outward;
             fan.gameObject.GetComponent<WindEffectPlayer>().PlayWindEffect(button.Type == ButtonType.Outward);
@@ -738,17 +738,17 @@ public class GameScene : MonoBehaviour
         Segment finalMoveTrace = new Segment(chaPos, finalMoveTo);
         CheckButtonPressed(finalMoveTrace);
         
-      //最后设置新的pos
-      
-        
-        if (_hitLeftWall && isRight)
-        {
-            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
-        }
-        else if (_hitRightWall && isLeft)
-        {
-            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
-        }
+      // //最后设置新的pos
+      //
+      //   
+      //   if (_hitLeftWall && isRight)
+      //   {
+      //       finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+      //   }
+      //   else if (_hitRightWall && isLeft)
+      //   {
+      //       finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+      //   }
 
         //最后设置新的pos
         cha.transform.position = finalMoveTo;
@@ -781,7 +781,6 @@ public class GameScene : MonoBehaviour
         
         cha.ChangeAction(chaSpineAction, true);
         cha.SetOnGround(finalOnGround);
-
     }
 
     public Vector2 CalculateWindSpeed(Vector2 characterPosition)
