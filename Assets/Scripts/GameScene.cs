@@ -67,6 +67,8 @@ public class GameScene : MonoBehaviour
         {
             Debug.Log("[" + _fans.Count + "]" + f.gameObject.name + " Found");
             _fans.Add(f);
+            f.ResetwindDirection();
+            f.SetSprite();
             f.GetComponent<WindEffectPlayer>().PlayWindEffect(f.WindDirection == WindDirection.Outward);
         }
 
@@ -558,7 +560,8 @@ public class GameScene : MonoBehaviour
     private void GameOver()
     {
         Debug.Log("Game Over!");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Scene currentScene = SceneManager.GetActiveScene();
+        SceneManager.LoadScene(currentScene.buildIndex);
     }
     
     
