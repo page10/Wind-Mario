@@ -28,9 +28,9 @@ public class HitBox : MonoBehaviour
 
     }
 
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.red;
-    //     Gizmos.DrawCube(Hitbox.center, Hitbox.size);
-    // }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(0.5f, 0, 0, 0.5f);
+        Gizmos.DrawCube(Hitbox.center, Hitbox.size);
+    }
 }

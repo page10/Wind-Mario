@@ -728,6 +728,34 @@ public class GameScene : MonoBehaviour
         
       //最后设置新的pos
         cha.transform.position = finalMoveTo;
+        string chaSpineAction = "idle";
+        if (!finalOnGround)
+        {
+            if (!rising)
+            {
+                chaSpineAction = "hoverboard";
+            }
+            else
+            {
+                chaSpineAction = "jump";
+            }
+        }
+        else if (Mathf.Abs(finalMoveTrace.p1.x - finalMoveTrace.p0.x) > 0.001f)
+        {
+            chaSpineAction = "run";
+        }
+        
+        // change transform accrording to the final move
+        if (finalMoveTo.x > chaPos.x)
+        {
+            cha.transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (finalMoveTo.x < chaPos.x)
+        {
+            cha.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        
+        cha.ChangeAction(chaSpineAction, true);
         cha.SetOnGround(finalOnGround);
     }
 

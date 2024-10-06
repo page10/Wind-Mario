@@ -1,3 +1,6 @@
+using System;
+using Spine;
+using Spine.Unity;
 using UnityEngine;
 
 public class Character : MonoBehaviour
@@ -10,6 +13,10 @@ public class Character : MonoBehaviour
     [Tooltip("刹车速度，也就是每个FixedUpdate减少多少")] public float speedDown = 0.05f;
     [Tooltip("最大左右移动速度")] public float maxSpeed = 0.3f;
     [Tooltip("是否接受玩家操作")] public bool playerControl = true;
+    [SerializeField]private SkeletonAnimation image;
+    private string _currentAction;
+    private SkeletonData _imageData;
+    private MeshRenderer _meshRenderer;
 
     /// <summary>
     /// 当前是否在地面上
@@ -80,6 +87,24 @@ public class Character : MonoBehaviour
         CurrentSpeed = new Vector2(CurrentSpeed.x, CurrentSpeed.y - weight);
         bool canContinueJump = CurrentSpeed.y + jump >= 0;
         return transform.position.y + CurrentSpeed.y + (tryJumping && canContinueJump ? jump : 0);
+    }
+
+    private void Start()
+    {
+        _imageData = image.SkeletonDataAsset.GetSkeletonData(true);
+        _meshRenderer = image.GetComponent<MeshRenderer>();
+        _meshRenderer.material = new Material(_meshRenderer.material);
+    }
+    
+    public void ChangeAction(string action, bool loop = true)
+    {
+        if (_currentAction == action) return;
+        Spine.Animation sa = _imageData?.FindAnimation(action);
+        
+        if (sa == null) return;
+        Debug.Log("ChangeAction: " + action + ">>>" + sa);
+        image.AnimationState.SetAnimation(0, action, loop);
+        _currentAction = action;
     }
 }
 
