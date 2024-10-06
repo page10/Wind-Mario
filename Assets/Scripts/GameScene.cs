@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -38,6 +39,7 @@ public class GameScene : MonoBehaviour
     private bool jump = false;
     // private bool _hitLeftWall = false;
     // private bool _hitRightWall = false;
+    public TextPrompt celebrateText;
     private void Start()
     {
         //游戏开始的时候从场景拿到所有配置好的collider
@@ -499,12 +501,14 @@ public class GameScene : MonoBehaviour
         if (_escapeDoorOpen && Vector2.Distance(_characters[0].transform.position, _escapeDoor.transform.position) < 1)
         {
             Debug.Log("You Win!");
-            Scene currentScene = SceneManager.GetActiveScene();
-            int currentSceneIndex = currentScene.buildIndex;
-            int totalSceneCount = SceneManager.sceneCountInBuildSettings;
-            
-            if (currentSceneIndex == totalSceneCount - 1) SceneManager.LoadScene("Scenes/WinScene");
-            else SceneManager.LoadScene(currentSceneIndex + 1);
+            if (celebrateText != null) celebrateText.ShowText("You Win!");
+            else Debug.Log("No TextPrompt found!");
+            // Scene currentScene = SceneManager.GetActiveScene();
+            // int currentSceneIndex = currentScene.buildIndex;
+            // int totalSceneCount = SceneManager.sceneCountInBuildSettings;
+            //
+            // if (currentSceneIndex == totalSceneCount - 1) SceneManager.LoadScene("Scenes/WinScene");
+            // else SceneManager.LoadScene(currentSceneIndex + 1);
             
         }
     }
