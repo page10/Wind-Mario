@@ -123,6 +123,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!212 &135083805 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4052205457931905684, guid: df3b72087d46aee42bac02623a70731d, type: 3}
+  m_PrefabInstance: {fileID: 6903030647310829392}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &231009694
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1268,11 +1273,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8516451619344421129, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -5.26
       objectReference: {fileID: 0}
     - target: {fileID: 8516451619344421129, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -3.72
       objectReference: {fileID: 0}
     - target: {fileID: 8516451619344421129, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1559,6 +1564,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1643868165847409858, guid: df3b72087d46aee42bac02623a70731d, type: 3}
+      propertyPath: spriteRenderer
+      value: 
+      objectReference: {fileID: 135083805}
+    - target: {fileID: 4052205457931905684, guid: df3b72087d46aee42bac02623a70731d, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4426235164503478431, guid: df3b72087d46aee42bac02623a70731d, type: 3}
       propertyPath: m_Name
       value: Player
@@ -1616,6 +1629,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3847763065222799183, guid: 6208c680e23407f4b825059166a69d9e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 6276481462761849301, guid: 6208c680e23407f4b825059166a69d9e, type: 3}
       propertyPath: lightOff
       value: 

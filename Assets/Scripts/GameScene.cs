@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// 游戏世界管理
@@ -18,6 +19,8 @@ public class GameScene : MonoBehaviour
     private Cage _cage;
     public GameObject _escapeDoor;
     private bool _escapeDoorOpen = false;
+    private List<HitBox> _hitBoxes = new List<HitBox>();
+    private List<HitBox> _hurtBoxes = new List<HitBox>();
 
 
     // 所有的天花板、地板等，在赋值完成时最好重新算一遍
@@ -87,6 +90,22 @@ public class GameScene : MonoBehaviour
         _rebornPoint = FindObjectOfType<RebornPoint>().gameObject.transform.position;
         PlayerReborn();
         
+        // hit boxes and hurt boxes
+        _hitBoxes.Clear();
+        _hurtBoxes.Clear();
+        HitBox[] hitBoxes = GameObject.FindObjectsOfType<HitBox>();
+        foreach (var hitBox in hitBoxes)
+        {
+            if (hitBox.isHit)
+            {
+                _hitBoxes.Add(hitBox);
+            }
+            if (hitBox.isHurt)
+            {
+                _hurtBoxes.Add(hitBox);
+            }
+        }
+        
         
         //最后开始运行游戏逻辑
         _gameRunning = true;
@@ -138,12 +157,12 @@ public class GameScene : MonoBehaviour
         {
             //这样得到了这个角色是不是玩家控制的
             bool underPlayerControl = cha.playerControl;
-            //todo 如何让玩家操作的角色动起来呢？仔细考虑一下
+
             CharacterHorizonMove move = CharacterHorizonMove.None;
             bool doJump = false;
             if (underPlayerControl)
             {
-                //todo 获得操作，然后给move和doJump赋值。
+
                 move = Input.GetAxis("Horizontal") < 0 ? CharacterHorizonMove.Left :
                     Input.GetAxis("Horizontal") > 0 ? CharacterHorizonMove.Right : CharacterHorizonMove.None;
                 doJump = jump;
@@ -156,7 +175,9 @@ public class GameScene : MonoBehaviour
             }
 
             MoveCharacter(cha, move, doJump);
+            
         }
+        CheckHitBoxes();
         //print("movey: " + _characters[0].CurrentSpeed.y + ">> On ground: " + _characters[0].OnGround + ">> Falling: " + _characters[0].Falling);
     }
 
@@ -473,6 +494,61 @@ public class GameScene : MonoBehaviour
             Debug.Log("You Win!");
         }
     }
+    
+    
+    private void CheckHitBoxes()
+    {
+        List<HitBox> hurtBoxToRemove = new List<HitBox>();
+        foreach (var hitBox in _hitBoxes)
+        {
+            foreach (var hurtBox in _hurtBoxes)
+            {
+                if (hurtBox.Dead || hitBox == hurtBox || !hitBox.CanHit(hitBox) ) continue;
+                
+                if (hitBox.Hitbox.Intersects(hurtBox.Hitbox))
+                {
+                   hurtBox.hp -= hitBox.attack;
+                   hitBox.AddHitRecord(hurtBox, hitBox.hitCoolDown);
+                   if (hurtBox.Dead)
+                   {
+                       hurtBoxToRemove.Add(hurtBox);
+                   }
+                }
+            }
+        }
+
+        foreach (var toRemove in hurtBoxToRemove)
+        {
+            Character cha = toRemove.gameObject.GetComponent<Character>();
+            if (cha)
+            {
+                KillCharacter(cha);
+            }
+            Destroy(toRemove.gameObject); 
+            _hurtBoxes.Remove(toRemove);
+            _hitBoxes.Remove(toRemove);
+        }
+        
+    }
+    
+    private void KillCharacter(Character cha)
+    {
+        _characters.Remove(cha);
+        Destroy(cha.gameObject);
+        foreach (var character in _characters)
+        {
+            if(character.playerControl) return;
+            
+        }
+        GameOver();
+    }
+    
+    private void GameOver()
+    {
+        Debug.Log("Game Over!");
+        SceneManager.LoadScene("Scenes/SampleScene");
+    }
+    
     
 
     /// <summary>
