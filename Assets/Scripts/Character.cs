@@ -25,8 +25,6 @@ public class Character : MonoBehaviour
 
     private bool _isJumping = false;
     
-    public bool IsTouchingLeftWall { get; private set; } = false;
-    public bool IsTouchingRightWall { get; private set; } = false;
     /// <summary>
     /// 当前是否在地面上
     /// </summary>
@@ -61,12 +59,6 @@ public class Character : MonoBehaviour
     /// <param name="dir"></param>
     public float HorizontalMove(CharacterHorizonMove dir)
     {
-        if ((IsTouchingLeftWall && dir == CharacterHorizonMove.Left) ||
-        (IsTouchingRightWall && dir == CharacterHorizonMove.Right))
-        {
-            return transform.position.x;
-        }
-        
         float currentMoveSpeed = OnGround ? moveSpeed : moveSpeed * airSpeedDown;
         float currentSpeedDown = OnGround ? speedDown : speedDown * airSpeedDown;
         switch (dir)
@@ -124,18 +116,6 @@ public class Character : MonoBehaviour
         if (CurrentSpeed.y < 0) _isJumping = false;
         return newPositionY;
     }
-    
-    /// <summary>
-    /// Set char speed to zero if the char is touching the wall
-    /// </summary>
-    /// <param name="touchingLeft"></param>
-    /// <param name="touchingRight"></param>
-    public void SetTouchingWall(bool touchingLeft, bool touchingRight)
-    {
-        IsTouchingLeftWall = touchingLeft;
-        IsTouchingRightWall = touchingRight;
-    }
-
 
     private void Start()
     {
