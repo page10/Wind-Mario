@@ -143,6 +143,7 @@ public class GameScene : MonoBehaviour
         foreach (var fan in _fans)
         {
             fan.ResetwindDirection();
+            fan.GetComponent<WindEffectPlayer>().PlayWindEffect(fan.WindDirection == WindDirection.Outward);
         }
         
         _cage.ResetCage();
