@@ -185,7 +185,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.46
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -210,7 +210,7 @@ Transform:
   m_GameObject: {fileID: 42991732}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.83, y: -1.21, z: -10}
+  m_LocalPosition: {x: 0.83, y: -0.61, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -985,11 +985,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: maxRange
-      value: 3
+      value: 2.65
       objectReference: {fileID: 0}
     - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: windSpeed
-      value: 5
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: WindDirection
@@ -1397,6 +1397,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
+      propertyPath: maxRange
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3155086136251285605, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: m_Size.x
       value: 2.7912543
