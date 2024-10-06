@@ -503,12 +503,12 @@ public class GameScene : MonoBehaviour
             Debug.Log("You Win!");
             if (celebrateText != null) celebrateText.ShowText("You Win!");
             else Debug.Log("No TextPrompt found!");
-            // Scene currentScene = SceneManager.GetActiveScene();
-            // int currentSceneIndex = currentScene.buildIndex;
-            // int totalSceneCount = SceneManager.sceneCountInBuildSettings;
-            //
-            // if (currentSceneIndex == totalSceneCount - 1) SceneManager.LoadScene("Scenes/WinScene");
-            // else SceneManager.LoadScene(currentSceneIndex + 1);
+            Scene currentScene = SceneManager.GetActiveScene();
+            int currentSceneIndex = currentScene.buildIndex;
+            int totalSceneCount = SceneManager.sceneCountInBuildSettings;
+            
+            if (currentSceneIndex == totalSceneCount - 1) SceneManager.LoadScene("Scenes/WinScene");
+            else SceneManager.LoadScene(currentSceneIndex + 1);
             
         }
     }

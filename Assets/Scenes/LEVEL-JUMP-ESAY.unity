@@ -366,6 +366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _escapeDoor: {fileID: 365750851}
+  celebrateText: {fileID: 0}
 --- !u!4 &403401848
 Transform:
   m_ObjectHideFlags: 0
@@ -1495,13 +1496,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1226320214470011757, guid: 20a66819257c0254785e3a74e030f951, type: 3}
+      propertyPath: m_Size.x
+      value: 0.48990917
+      objectReference: {fileID: 0}
+    - target: {fileID: 1226320214470011757, guid: 20a66819257c0254785e3a74e030f951, type: 3}
+      propertyPath: m_DrawMode
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2016263636147053623, guid: 20a66819257c0254785e3a74e030f951, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3494437459006658763, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_Name
       value: Spike
       objectReference: {fileID: 0}
+    - target: {fileID: 7840388426453625585, guid: 20a66819257c0254785e3a74e030f951, type: 3}
+      propertyPath: m_Size.x
+      value: 0.50298834
+      objectReference: {fileID: 0}
+    - target: {fileID: 7840388426453625585, guid: 20a66819257c0254785e3a74e030f951, type: 3}
+      propertyPath: m_DrawMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8516451619344421129, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.26
+      value: -5.06
       objectReference: {fileID: 0}
     - target: {fileID: 8516451619344421129, guid: 20a66819257c0254785e3a74e030f951, type: 3}
       propertyPath: m_LocalPosition.y
