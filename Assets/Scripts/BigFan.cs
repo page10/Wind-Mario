@@ -11,6 +11,7 @@ public class BigFan : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public Sprite spriteInward;
     public Sprite spriteOutward;
+    public float maxRange = 99f;
     private WindDirection _initialWindDirection;
     
     private void Start()
