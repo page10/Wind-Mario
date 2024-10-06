@@ -203,7 +203,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1434545269196385360, guid: 656030e901759744fa442c8db0cf8adc, type: 3}
       propertyPath: maxRange
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1434545269196385360, guid: 656030e901759744fa442c8db0cf8adc, type: 3}
       propertyPath: windSpeed
@@ -1244,7 +1244,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: maxRange
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1434545269196385360, guid: 29f79820af63aed4f9c3b93bc7c7a619, type: 3}
       propertyPath: windSpeed
@@ -1780,6 +1780,10 @@ PrefabInstance:
       propertyPath: image
       value: 
       objectReference: {fileID: 1390114099}
+    - target: {fileID: 8449269744076264959, guid: df3b72087d46aee42bac02623a70731d, type: 3}
+      propertyPath: jumpForce
+      value: 5.5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 8312808305652018156, guid: df3b72087d46aee42bac02623a70731d, type: 3}
     m_RemovedGameObjects:

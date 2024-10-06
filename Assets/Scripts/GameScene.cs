@@ -36,7 +36,8 @@ public class GameScene : MonoBehaviour
     private bool _gameRunning = false;
 
     private bool jump = false;
-
+    private bool _hitLeftWall = false;
+    private bool _hitRightWall = false;
     private void Start()
     {
         //游戏开始的时候从场景拿到所有配置好的collider
@@ -471,12 +472,13 @@ public class GameScene : MonoBehaviour
     
     private void PressButton(ButtonWind button)
     {
+        Debug.Log("Button pressed: " + button.name);
         button.PressButton();
         _cage.AddLightOnCount();
         _buttonPressed++;
         // change wind direction according to button
-        foreach (var fan in _fans)
-        {
+        foreach (var fan in button.GetControlledFans())
+        {   
             fan.WindDirection = button.Type == ButtonType.Inward ? WindDirection.Inward : WindDirection.Outward;
             fan.gameObject.GetComponent<WindEffectPlayer>().PlayWindEffect(button.Type == ButtonType.Outward);
             fan.SetSprite();
@@ -495,6 +497,13 @@ public class GameScene : MonoBehaviour
         if (_escapeDoorOpen && Vector2.Distance(_characters[0].transform.position, _escapeDoor.transform.position) < 1)
         {
             Debug.Log("You Win!");
+            Scene currentScene = SceneManager.GetActiveScene();
+            int currentSceneIndex = currentScene.buildIndex;
+            int totalSceneCount = SceneManager.sceneCountInBuildSettings;
+            
+            if (currentSceneIndex == totalSceneCount - 1) SceneManager.LoadScene("Scenes/WinScene");
+            else SceneManager.LoadScene(currentSceneIndex + 1);
+            
         }
     }
     
@@ -730,6 +739,18 @@ public class GameScene : MonoBehaviour
         CheckButtonPressed(finalMoveTrace);
         
       //最后设置新的pos
+      
+        
+        if (_hitLeftWall && isRight)
+        {
+            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+        }
+        else if (_hitRightWall && isLeft)
+        {
+            finalMoveTo = new Vector2(wishToPos.x, finalMoveTo.y);
+        }
+
+        //最后设置新的pos
         cha.transform.position = finalMoveTo;
         string chaSpineAction = "idle";
         if (!finalOnGround)
@@ -760,6 +781,7 @@ public class GameScene : MonoBehaviour
         
         cha.ChangeAction(chaSpineAction, true);
         cha.SetOnGround(finalOnGround);
+
     }
 
     public Vector2 CalculateWindSpeed(Vector2 characterPosition)

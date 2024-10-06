@@ -15,6 +15,8 @@ public class ButtonWind : MonoBehaviour
     public ButtonStatus Status { get; private set; } = ButtonStatus.Normal;
     public ButtonType Type = ButtonType.Inward;
     private List<Segment> segments = new List<Segment>();
+
+    [SerializeField] private List<BigFan> controlledFans = new List<BigFan>();
     
     public void SetStatus(ButtonStatus status)
     {
@@ -29,7 +31,11 @@ public class ButtonWind : MonoBehaviour
                 break;
         }
     }
-    
+
+    public List<BigFan> GetControlledFans()
+    {
+        return controlledFans;
+    }
     
     public void SetSegments(List<Segment> segments)
     {

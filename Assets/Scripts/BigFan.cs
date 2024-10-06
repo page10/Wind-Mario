@@ -21,7 +21,7 @@ public class BigFan : MonoBehaviour
     }
     
     public void SetSprite()
-    {
+    {   
         spriteRenderer.sprite = WindDirection == WindDirection.Inward ? spriteInward : spriteOutward;
     }
     
