@@ -66,6 +66,7 @@ public class GameScene : MonoBehaviour
         {
             Debug.Log("[" + _fans.Count + "]" + f.gameObject.name + " Found");
             _fans.Add(f);
+            f.GetComponent<WindEffectPlayer>().PlayWindEffect(f.WindDirection == WindDirection.Outward);
         }
 
         CalculateWindRegions();
@@ -476,6 +477,7 @@ public class GameScene : MonoBehaviour
         foreach (var fan in _fans)
         {
             fan.WindDirection = button.Type == ButtonType.Inward ? WindDirection.Inward : WindDirection.Outward;
+            fan.gameObject.GetComponent<WindEffectPlayer>().PlayWindEffect(button.Type == ButtonType.Outward);
             fan.SetSprite();
         }
         CalculateWindRegions();
