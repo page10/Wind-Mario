@@ -558,7 +558,7 @@ public class GameScene : MonoBehaviour
     private void GameOver()
     {
         Debug.Log("Game Over!");
-        SceneManager.LoadScene("Scenes/SampleScene");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
     
