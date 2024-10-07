@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,6 +15,13 @@ public class BigFan : MonoBehaviour
     public float maxRange = 99f;
     private WindDirection _initialWindDirection;
     
+    public SceneCollider Collider { get; private set; }
+
+    private void Awake()
+    {
+        Collider = GetComponent<SceneCollider>();
+    }
+
     private void Start()
     {
         spriteRenderer.sprite = WindDirection == WindDirection.Inward ? spriteInward : spriteOutward;

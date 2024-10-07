@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -9,6 +10,8 @@ public struct Segment
 {
     public Vector2 p0;
     public Vector2 p1;
+
+    public List<Vector2> Vertex => new List<Vector2> { p0, p1 };
     
     public Segment(Vector2 p0, Vector2 p1)
     {
